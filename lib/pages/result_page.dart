@@ -13,18 +13,22 @@ class ResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateTime currentTime = DateTime.now();
-
-    DateTime nightStartTime =
-        DateTime(currentTime.year, currentTime.month, currentTime.day, 19);
-    DateTime nightEndTime =
-        DateTime(currentTime.year, currentTime.month, currentTime.day, 6);
-    bool isNightTime = currentTime.isAfter(nightStartTime) ||
-        currentTime.isBefore(nightEndTime);
     return BlocBuilder<WeatherCubit, WeatherState>(
       builder: (context, state) {
         if (state is WeatherSuccessState) {
+          DateTime currentTime = DateTime.now();
           weatherModel = state.weatherModel;
+
+          print(weatherModel!.sunrise.hour);
+          print(weatherModel!.sunset.hour);
+
+          DateTime nightStartTime = DateTime(currentTime.year,
+              currentTime.month, currentTime.day, weatherModel!.sunset.hour);
+          DateTime nightEndTime = DateTime(currentTime.year, currentTime.month,
+              currentTime.day, weatherModel!.sunrise.hour);
+          bool isNightTime = currentTime.isAfter(nightStartTime) ||
+              currentTime.isBefore(nightEndTime);
+
           return Scaffold(
               appBar: AppBar(
                 backgroundColor: isNightTime
@@ -109,7 +113,7 @@ class ResultPage extends StatelessWidget {
                                   height: 15,
                                 ),
                                 Text(
-                                  "${weatherModel!.temp}°C",
+                                  "${weatherModel!.temp.round()}°C",
                                   style: TextStyle(
                                       color: Colors.grey[300],
                                       fontSize: 32,
@@ -148,7 +152,7 @@ class ResultPage extends StatelessWidget {
                                             ],
                                           ),
                                           Text(
-                                            "${weatherModel!.minTemp}22°C",
+                                            "${weatherModel!.minTemp.round()}°C",
                                             style: const TextStyle(
                                                 height: 1.2, fontSize: 12),
                                           )
@@ -179,7 +183,7 @@ class ResultPage extends StatelessWidget {
                                             ],
                                           ),
                                           Text(
-                                            "${weatherModel!.maxTemp}°C",
+                                            "${weatherModel!.maxTemp.round()}°C",
                                             style: const TextStyle(
                                                 height: 1.2, fontSize: 12),
                                           )
@@ -265,7 +269,7 @@ class ResultPage extends StatelessWidget {
                                   height: 15,
                                 ),
                                 Text(
-                                  "${weatherModel!.temp}°C",
+                                  "${weatherModel!.temp.round()}°C",
                                   style: TextStyle(
                                       color: Colors.grey[300],
                                       fontSize: 32,
@@ -304,7 +308,7 @@ class ResultPage extends StatelessWidget {
                                             ],
                                           ),
                                           Text(
-                                            "${weatherModel!.minTemp}°C",
+                                            "${weatherModel!.minTemp.round()}°C",
                                             style: const TextStyle(
                                                 height: 1.2, fontSize: 12),
                                           )
@@ -335,7 +339,7 @@ class ResultPage extends StatelessWidget {
                                             ],
                                           ),
                                           Text(
-                                            "${weatherModel!.maxTemp}°C",
+                                            "${weatherModel!.maxTemp.round()}°C",
                                             style: const TextStyle(
                                                 height: 1.2, fontSize: 12),
                                           )

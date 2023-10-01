@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:intl/intl.dart';
 
 class WeatherModel {
   final String cityName;
@@ -9,17 +10,27 @@ class WeatherModel {
   final String? image;
   final double minTemp;
   final String weatherStateName;
+  final DateTime sunrise;
+  final DateTime sunset;
 
-  WeatherModel(
-      {required this.date,
-      required this.temp,
-      required this.maxTemp,
-      required this.minTemp,
-      required this.weatherStateName,
-      required this.cityName,
-      this.image});
+  WeatherModel({
+    required this.date,
+    required this.temp,
+    required this.maxTemp,
+    required this.minTemp,
+    required this.weatherStateName,
+    required this.cityName,
+    this.image,
+    required this.sunrise,
+    required this.sunset,
+  });
 
   factory WeatherModel.fromJson(json) {
+    String sunriseTime = json["forecast"]["forecastday"][0]["astro"]["sunrise"];
+    String sunsetTime = json["forecast"]["forecastday"][0]["astro"]["sunset"];
+
+    DateTime sunrise = DateFormat('hh:mm a').parse(sunriseTime);
+    DateTime sunset = DateFormat('hh:mm a').parse(sunsetTime);
     return WeatherModel(
         date: json["current"]["last_updated"],
         temp: json["forecast"]["forecastday"][0]["day"]["avgtemp_c"],
@@ -28,7 +39,39 @@ class WeatherModel {
         weatherStateName: json["forecast"]["forecastday"][0]["day"]["condition"]
             ["text"],
         image: json["forecast"]["forecastday"][0]["day"]["condition"]["icon"],
-        cityName: json["location"]["name"]);
+        cityName: json["location"]["name"],
+        sunrise: sunrise,
+        sunset: sunset);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "current": {
+        "last_updated": date,
+      },
+      "forecast": {
+        "forecastday": [
+          {
+            "day": {
+              "avgtemp_c": temp,
+              "maxtemp_c": maxTemp,
+              "mintemp_c": minTemp,
+              "condition": {
+                "text": weatherStateName,
+                "icon": image,
+              },
+            },
+            "astro": {
+              "sunrise": sunrise.toIso8601String(),
+              "sunset": sunset.toIso8601String(),
+            },
+          },
+        ],
+      },
+      "location": {
+        "name": cityName,
+      },
+    };
   }
 
   @override
